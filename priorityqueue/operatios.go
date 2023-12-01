@@ -14,13 +14,13 @@ func (h *Heap[T]) Push(item T) error {
 	if h.size >= len(h.data) {
 		return fmt.Errorf("container is full, can't add more data")
 	}
-	h.size++
 	cur := h.size
 	h.data[cur] = item
 	for h.comperator(&h.data[cur], &h.data[parentIndex(cur)]) {
 		h.swap(cur, parentIndex(cur))
 		cur = parentIndex(cur)
 	}
+	h.size++
 	return nil
 }
 

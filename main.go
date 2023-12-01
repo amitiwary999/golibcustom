@@ -18,13 +18,18 @@ func main() {
 		if err != nil {
 			fmt.Print(err)
 		}
-		fmt.Printf("peek item %T", pI)
+		fmt.Printf("peek item %d \n", pI)
 
 		po, err := h.Pop()
-
 		if err != nil {
 			fmt.Print(err)
 		}
-		fmt.Printf("pop item %T", po)
+		fmt.Printf("pop item %d \n", po)
+
+		pinext, err := h.Peek()
+		if err != nil {
+			fmt.Print(err)
+		}
+		fmt.Printf("peek item %d \n", pinext)
 	}()
 }
