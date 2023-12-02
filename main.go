@@ -6,8 +6,9 @@ import (
 )
 
 func main() {
+	comparatorfunc := func(a, b *int) bool { return b == nil || a != nil && *a < *b }
 	func() {
-		h := heap.NewHeap(20, func(a, b *int) bool { return b == nil || a != nil && *a < *b })
+		h := heap.NewHeap(20, comparatorfunc)
 		h.Push(12)
 		h.Push(23)
 		h.Push(17)
