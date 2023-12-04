@@ -1,4 +1,4 @@
-package waitgrpsmpl
+package gortntry
 
 import (
 	"fmt"
