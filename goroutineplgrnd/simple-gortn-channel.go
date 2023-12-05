@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func cpuIntensiveTask(ch *chan string, name string, waitTime int) {
@@ -33,4 +35,33 @@ func DoOperationSimple() {
 	}
 	waitFirstTaskComplete(&chnl, cancel)
 	fmt.Println("All goroutine done and program stop")
+}
+
+func waitFirstTaskCompleteErrGroup(ch *chan string, cntx context.Context) {
+	for {
+		value, _ := <-*ch
+		if value == "firstTask" {
+			cntx.Done()
+			return
+		}
+	}
+}
+
+func DoOperationSimpleErrGrp() {
+	ctx := context.Background()
+	eg, egCtx := errgroup.WithContext(ctx)
+	chnl := make(chan string)
+	nameArray := [6]string{"firstTask", "secondTask", "thirdTask", "fourthTask", "fifthTask", "sixthTask"}
+	waitTimeArray := [6]int{13, 18, 1, 24, 36, 16}
+
+	for i, name := range nameArray {
+		index := i
+		taskName := name
+		eg.Go(func() error {
+			cpuIntensiveTask(&chnl, taskName, waitTimeArray[index])
+			return nil
+		})
+	}
+	waitFirstTaskCompleteErrGroup(&chnl, egCtx)
+
 }
