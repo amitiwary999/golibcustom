@@ -14,11 +14,11 @@ func cpuIntensiveTask(ch *chan string, name string, waitTime int) {
 	*ch <- name
 }
 
+/* for loop keep run and read the value from channel, if it is firstTask then return*/
 func waitFirstTaskComplete(ch *chan string, cancel context.CancelFunc) {
 	for {
 		value, _ := <-*ch
 		if value == "firstTask" {
-			cancel()
 			return
 		}
 	}
@@ -29,10 +29,10 @@ func DoOperationSimple() {
 	chnl := make(chan string)
 	nameArray := [6]string{"firstTask", "secondTask", "thirdTask", "fourthTask", "fifthTask", "sixthTask"}
 	waitTimeArray := [6]int{13, 18, 1, 24, 36, 16}
-
 	for i, name := range nameArray {
 		go cpuIntensiveTask(&chnl, name, waitTimeArray[i])
 	}
+	/* it keep wait here and once function return then move to next step. if value is firstTask then it return*/
 	waitFirstTaskComplete(&chnl, cancel)
 	fmt.Println("All goroutine done and program stop")
 }
@@ -42,7 +42,7 @@ func waitFirstTaskCompleteErrGroup(ch *chan string, cntx context.Context) {
 		value, _ := <-*ch
 		if value == "firstTask" {
 			cntx.Done()
-			return
+			// return
 		}
 	}
 }
