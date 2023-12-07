@@ -14,7 +14,12 @@ func cpuIntensiveTask(ch *chan string, name string, waitTime int) {
 	*ch <- name
 }
 
-/* for loop keep run and read the value from channel, if it is firstTask then return*/
+/*
+for loop keep run and read the value from channel, if it is firstTask then return
+So this method make sure that it return and calling function move to next step like DoOperationSimple function.
+If it doesn't return, which is possible if channel doesn't have value firstTask, then the calling function stuck and goroutine
+remain asleep
+*/
 func waitFirstTaskComplete(ch *chan string, cancel context.CancelFunc) {
 	for {
 		value, _ := <-*ch
