@@ -20,7 +20,7 @@ So this method make sure that it return and calling function move to next step l
 If it doesn't return, which is possible if channel doesn't have value firstTask, then the calling function stuck and goroutine
 remain asleep
 */
-func waitFirstTaskComplete(ch *chan string, cancel context.CancelFunc) {
+func waitFirstTaskComplete(ch *chan string) {
 	for {
 		value, _ := <-*ch
 		if value == "firstTask" {
@@ -30,7 +30,6 @@ func waitFirstTaskComplete(ch *chan string, cancel context.CancelFunc) {
 }
 
 func DoOperationSimple() {
-	_, cancel := context.WithCancel(context.Background())
 	chnl := make(chan string)
 	nameArray := [6]string{"firstTask", "secondTask", "thirdTask", "fourthTask", "fifthTask", "sixthTask"}
 	waitTimeArray := [6]int{13, 18, 1, 24, 36, 16}
@@ -38,7 +37,7 @@ func DoOperationSimple() {
 		go cpuIntensiveTask(&chnl, name, waitTimeArray[i])
 	}
 	/* it keep wait here and once function return then move to next step. if value is firstTask then it return*/
-	waitFirstTaskComplete(&chnl, cancel)
+	waitFirstTaskComplete(&chnl)
 	fmt.Println("All goroutine done and program stop")
 }
 
@@ -52,6 +51,7 @@ func waitFirstTaskCompleteErrGroup(ch *chan string, cntx context.Context) {
 	}
 }
 
+/** I need to work on this, once I understand the error group usage */
 func DoOperationSimpleErrGrp() {
 	ctx := context.Background()
 	eg, egCtx := errgroup.WithContext(ctx)
