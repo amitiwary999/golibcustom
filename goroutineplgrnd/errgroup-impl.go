@@ -28,7 +28,7 @@ func (eg *ErGroup) done() {
 	eg.wg.Done()
 }
 
-func (eg *ErGroup) wait() error {
+func (eg *ErGroup) Wait() error {
 	eg.wg.Wait()
 	return eg.err
 }
