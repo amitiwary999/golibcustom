@@ -28,6 +28,7 @@ func (eg *ErGroup) done() {
 	eg.wg.Done()
 }
 
+/**return the first error that we save in err of ErGroup struct once all goroutines is done*/
 func (eg *ErGroup) Wait() error {
 	eg.wg.Wait()
 	return eg.err
@@ -41,6 +42,7 @@ func (eg *ErGroup) Go(f func() error) {
 	go func() {
 		defer eg.done()
 		if err := f(); err != nil {
+			/**register the first error that we found*/
 			eg.errOnce.Do(func() {
 				eg.err = err
 				if eg.cancel != nil {
