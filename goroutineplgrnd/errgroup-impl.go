@@ -36,6 +36,7 @@ func (eg *ErGroup) Wait() error {
 
 func (eg *ErGroup) Go(f func() error) {
 	if eg.sem != nil {
+		/** empty struct helps to save memory. if we use string then there is some exchange of data between the goroutines*/
 		eg.sem <- semToken{}
 	}
 	eg.wg.Add(1)
@@ -51,6 +52,34 @@ func (eg *ErGroup) Go(f func() error) {
 			})
 		}
 	}()
+}
+
+/*
+  - this function use when we don't want to wait if number of goroutines active is already equal to limit
+    but return false that inform that we already have n number of active goroutine and can't process new
+*/
+func (eg *ErGroup) NoWaitGo(fn func() error) bool {
+	if eg.sem != nil {
+		select {
+		case eg.sem <- semToken{}:
+		default:
+			return false
+		}
+	}
+	eg.wg.Add(1)
+	go func() {
+		defer eg.done()
+		if err := fn(); err != nil {
+			/**register the first error that we found*/
+			eg.errOnce.Do(func() {
+				eg.err = err
+				if eg.cancel != nil {
+					eg.cancel(err)
+				}
+			})
+		}
+	}()
+	return true
 }
 
 func (eg *ErGroup) SetLimit(n int) {
