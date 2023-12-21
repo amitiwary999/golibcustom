@@ -1,6 +1,24 @@
 package noduplicate
 
-import "sync"
+import (
+	"errors"
+	"fmt"
+	"sync"
+)
+
+var errGoexit = errors.New("runtime.Goexit was called")
+
+type panicError struct {
+	value interface{}
+}
+
+func (p *panicError) Error() string {
+	return fmt.Sprintf("%v\n", p.value)
+}
+
+func newPanicError(v interface{}) error {
+	return &panicError{value: v}
+}
 
 type call struct {
 	wg  sync.WaitGroup
@@ -35,12 +53,34 @@ func (g *Group) Do(key string, fn func() (interface{}, error)) (v interface{}, e
 }
 
 func (g *Group) makeCall(c *call, key string, fn func() (interface{}, error)) {
+	normalError := false
+	errorRecovered := false
 	defer func() {
+		if !normalError && !errorRecovered {
+			c.err = errGoexit
+		}
 		c.wg.Done()
 		if g.m[key] != nil {
 			delete(g.m, key)
 		}
+		if e, ok := c.err.(*panicError); ok {
+			panic(e)
+		}
 	}()
 
-	c.val, c.err = fn()
+	func() {
+		defer func() {
+			if !normalError {
+				if r := recover(); r != nil {
+					c.err = newPanicError(r)
+				}
+			}
+		}()
+		c.val, c.err = fn()
+		normalError = true
+	}()
+
+	if !normalError {
+		errorRecovered = true
+	}
 }
