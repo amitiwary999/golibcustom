@@ -1,6 +1,9 @@
 package multipartmap
 
-import "hash/crc32"
+import (
+	"fmt"
+	"hash/crc32"
+)
 
 type mapData[T comparable] struct {
 	m map[T]interface{}
@@ -11,9 +14,10 @@ type partion[T comparable] struct {
 	val  []*mapData[T]
 }
 
-func (p *partion[T]) findPartition(key string) int {
-	hash := crc32.ChecksumIEEE([]byte(key))
-	return int(hash) % p.size
+func findPartition[T comparable](key T, size int) int {
+	str := fmt.Sprintf("%v", key)
+	hash := crc32.ChecksumIEEE([]byte(str))
+	return int(hash) % size
 }
 
 func NewPartitionedMap[T comparable](size int) *partion[T] {
@@ -23,4 +27,17 @@ func NewPartitionedMap[T comparable](size int) *partion[T] {
 		partions = append(partions, &mapData[T]{m})
 	}
 	return &partion[T]{size: size, val: partions}
+}
+
+func (p *partion[T]) Set(key T, val interface{}) {
+	partN := findPartition[T](key, p.size)
+	mp := p.val[partN]
+	mp.m[key] = val
+}
+
+func (p *partion[T]) Get(key T) interface{} {
+	partN := findPartition[T](key, p.size)
+	fmt.Printf("part to read %d\n", partN)
+	mp := p.val[partN]
+	return mp.m[key]
 }
