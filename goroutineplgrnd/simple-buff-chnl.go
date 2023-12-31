@@ -11,6 +11,10 @@ type bufChn struct {
 	wg      sync.WaitGroup
 }
 
+/*
+* use this to Wait for all operation to complete. If main function exit before the completion then
+EntryFunc doesn't run all the goroutine
+*/
 func (b *bufChn) Wait() {
 	b.wg.Wait()
 }
@@ -35,4 +39,11 @@ func NewBufChn() *bufChn {
 	return &bufChn{
 		nameChn: make(chan string, 4),
 	}
+}
+
+func (b *bufChn) Run() {
+	for i := 0; i < 8; i++ {
+		b.EntryFunc(fmt.Sprint(i))
+	}
+	fmt.Println("done in loop")
 }
