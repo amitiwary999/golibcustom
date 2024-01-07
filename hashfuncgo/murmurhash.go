@@ -1,12 +1,16 @@
 package hashgo
 
-import "math/bits"
+import (
+	"math/bits"
+)
 
-func MurMurHash(key []byte, seed uint32) uint32 {
+/** MurMurHash use multiply and xor to create hash from array byte */
+
+func MurMurHash3(key []byte, seed uint32) uint32 {
 	var length int = len(key)
 	var blocks int = length / 4 // divide in 32 bits or 4 bytes blocks
-	const mulc1 = 0xca8e2d41
-	const mulc2 = 0xa9a92e51
+	const mulc1 = 0xcc9e2d51
+	const mulc2 = 0x1b873593
 	ans := seed
 
 	for i := 0; i < blocks; i++ {
@@ -20,6 +24,8 @@ func MurMurHash(key []byte, seed uint32) uint32 {
 	}
 	tail := key[4*blocks:]
 	var k1 uint32
+	/** if length is multiple of 4 then it means when we work on block of 4 there will be some element left.
+	  depending on how many element left we handle it*/
 	switch length & 3 {
 	case 3:
 		k1 ^= uint32(tail[2]) << 16
