@@ -13,6 +13,7 @@ func resolver(domain string, qtype uint16) []dns.RR {
 	msg.SetQuestion(domain, qtype)
 
 	c := &dns.Client{Timeout: 5 * time.Second}
+	/** 8.8.8.8:53 is the public ip of google */
 	response, _, err := c.Exchange(msg, "8.8.8.8:53")
 	if err != nil {
 		log.Printf("ERROR : %v\n", err)
