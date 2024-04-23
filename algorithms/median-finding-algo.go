@@ -20,7 +20,9 @@ func findIthSmall(ar []int, i int) int {
 		divAr = append(divAr, ar[flag:flag+5])
 		flag = flag + 5
 	}
-	divAr = append(divAr, ar[flag:])
+	if flag < len(ar) {
+		divAr = append(divAr, ar[flag:])
+	}
 	var median []int
 	for _, arr := range divAr {
 		sort.Slice(arr, func(i2, j int) bool {
@@ -50,8 +52,8 @@ func findIthSmall(ar []int, i int) int {
 		return divi
 	}
 	if diviInd > i {
-		return findIthSmall(medianAccAr[:diviInd], i)
+		return findIthSmall(medianAccAr[:diviInd+1], i)
 	} else {
-		return findIthSmall(medianAccAr[diviInd:], i-diviInd)
+		return findIthSmall(medianAccAr[diviInd+1:], i-diviInd)
 	}
 }
