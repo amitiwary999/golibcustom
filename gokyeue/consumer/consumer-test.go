@@ -23,7 +23,7 @@ func (msh *MsgHandler) MessageHandler(msg model.Message) error {
 func StartConsumer() {
 	gracefulShutdown := make(chan os.Signal, 1)
 	signal.Notify(gracefulShutdown, syscall.SIGINT, syscall.SIGTERM)
-	dbClient, err := storage.NewPostgresClient("", 10, 10)
+	dbClient, err := storage.NewPostgresClient("postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable", 10, 10)
 	if err != nil {
 		log.Fatal(err)
 	}
