@@ -1,4 +1,4 @@
-package gokyeuconsumer
+package gokyeuerun
 
 import (
 	"context"
@@ -27,9 +27,10 @@ func StartConsumer() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	consmr := consumer.NewQueueConsumer(dbClient, "prac-queue", 1, &MsgHandler{})
+	consmr := consumer.NewQueueConsumer(dbClient, "prac_queue", 1, &MsgHandler{})
+	consmr.SetMaxMessage(3)
 	ctx := context.Background()
-	consmr.Consume(ctx)
+	go consmr.Consume(ctx)
 	<-gracefulShutdown
 	ctx.Done()
 }
