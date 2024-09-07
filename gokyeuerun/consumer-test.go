@@ -28,7 +28,8 @@ func StartConsumer() {
 		log.Fatal(err)
 	}
 	consmr := consumer.NewQueueConsumer(dbClient, "prac_queue", 1, &MsgHandler{})
-	consmr.SetMaxMessage(3)
+	consmr.SetMaxMessage(30)
+	consmr.SetMessageFetchLimit(3)
 	ctx := context.Background()
 	go consmr.Consume(ctx)
 	<-gracefulShutdown
